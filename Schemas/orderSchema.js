@@ -1,7 +1,10 @@
 import joi from "joi";
 
 const orderValidation = joi.object({
-  quantity: joi.number(5).positive().required(),
+  clientId: joi.number().integer().required(),
+  cakeId: joi.number().integer().required(),
+  quantity: joi.number().integer().required(),
+  totalPrice: joi.number().required(),
 });
 
 export { orderValidation };

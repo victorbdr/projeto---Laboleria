@@ -5,7 +5,8 @@ CREATE TABLE "cakes" (
     "name" VARCHAR ( 50 ) UNIQUE NOT NULL,
     "price" NUMERIC (8,2)
     "image" VARCHAR ( 255 ) UNIQUE NOT NULL,
-    "description" TEXT NOT NULL
+    "description" TEXT NOT NULL,
+);
 
 CREATE TABLE "clients" (
     "id" SERIAL PRIMARY KEY NOT NULL,
