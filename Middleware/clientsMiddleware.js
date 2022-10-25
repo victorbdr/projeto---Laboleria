@@ -1,11 +1,11 @@
 import { clientValidation } from "../Schemas/clientSchema.js";
 
 async function validClient(req, res, next) {
-  const { name, address, phone } = req.body;
+  const { name, adress, phone } = req.body;
 
   const validClient = clientValidation.validate({
     name,
-    address,
+    adress,
     phone,
   });
   if (validClient.error) {

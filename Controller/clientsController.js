@@ -1,13 +1,13 @@
 import db from "../db/db.js";
 
 async function myClients(req, res) {
-  const { name, address, phone } = req.body;
+  const { name, adress, phone } = req.body;
   try {
     await db.query(
-      `INSERT into clients(name, address, phone) VALUES($1,$2,$3)`,
-      [name, address, phone]
+      `INSERT into clients(name, adress, phone) VALUES($1,$2,$3)`,
+      [name, adress, phone]
     );
-    res.sendStatus(201);
+    return res.sendStatus(201);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

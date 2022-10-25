@@ -4,6 +4,6 @@ import { validClient } from "../Middleware/clientsMiddleware.js";
 
 const clientRoute = Router();
 
-clientRoute.post("/cakes", validClient, myClients);
+clientRoute.post("/clients", validClient, myClients);
 
 export default clientRoute;
