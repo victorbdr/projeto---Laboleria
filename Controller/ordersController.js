@@ -1,4 +1,5 @@
 import db from "../db/db.js";
+import dayjs from "dayjs";
 
 async function orderByClient(req, res) {
   const { clientId, cakeId, quantity, totalPrice } = req.body;
@@ -18,21 +19,26 @@ async function getOrdersByDate(req, res) {
   const { date } = req.query;
   if (date) {
     try {
-      const { rows: withDate } = await db.query(
+      const withDate = await db.query(
         `SELECT orders.id AS "ordersId", orders."createdAt", orders.quantity, orders."totalPrice",
-      cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image,
-      clients.id AS "clientId", clients.name AS "clientName", clients.adress, clients.phone FROM orders
-      JOIN clients ON "clientId" = clients.id
-      JOIN cakes ON "cakeId" = cakes.id
-      WHERE orders."createdAt" = $1`,
+        cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image,
+        clients.id AS "clientId", clients.name AS "clientName", clients.address, clients.phone FROM orders
+        JOIN clients ON "clientId" = clients.id
+        JOIN cakes ON "cakeId" = cakes.id
+        WHERE orders."createdAt"::date = $1`,
         [`${date}`]
       );
-      const allInfo = withDate.map((data) => {
+
+      if (withDate.rowCount === 0) {
+        return res.status(404).send([]);
+      }
+
+      const allInfo = withDate.rows.map((data) => {
         const info = {
           client: {
             id: data.clientId,
             name: data.clientName,
-            address: data.adress,
+            address: data.address,
             phone: data.phone,
           },
           cake: {
@@ -43,7 +49,7 @@ async function getOrdersByDate(req, res) {
             image: data.image,
           },
           orderId: data.ordersId,
-          createdAt: new Date(data.toDateString()),
+          createdAt: data.createdAt,
           quantity: data.quantity,
           totalPrice: data.totalPrice,
         };
@@ -56,19 +62,19 @@ async function getOrdersByDate(req, res) {
     }
   } else {
     try {
-      const { rows: noDate } = await db.query(
+      const noDate = await db.query(
         `SELECT orders.id AS "ordersId", orders."createdAt", orders.quantity, orders."totalPrice",
       cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image,
-      clients.id AS "clientId", clients.name AS "clientName", clients.adress, clients.phone FROM orders
+      clients.id AS "clientId", clients.name AS "clientName", clients.address, clients.phone FROM orders
       JOIN clients ON "clientId" = clients.id
       JOIN cakes ON "cakeId" = cakes.id`
       );
-      const allInfo = noDate.map((data) => {
+      const allInfo = noDate.rows.map((data) => {
         const info = {
           client: {
             id: data.clientId,
             name: data.clientName,
-            address: data.adress,
+            address: data.address,
             phone: data.phone,
           },
           cake: {
@@ -96,21 +102,28 @@ async function getOrdersByDate(req, res) {
 async function orderById(req, res) {
   const { id } = req.params;
   try {
-    const { rows: byId } = await db.query(
+    const paramsCheck = await db.query(`SELECT * FROM orders WHERE id=$1`, [
+      id,
+    ]);
+    if (paramsCheck.rowCount === 0) {
+      return res.sendStatus(404);
+    }
+    const byId = await db.query(
       `SELECT orders.id AS "ordersId", orders."createdAt", orders.quantity, orders."totalPrice",
 cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image,
-clients.id AS "clientId", clients.name AS "clientName", clients.adress, clients.phone FROM orders
+clients.id AS "clientId", clients.name AS "clientName", clients.address, clients.phone FROM orders
 JOIN clients ON "clientId" = clients.id
 JOIN cakes ON "cakeId" = cakes.id
 WHERE orders.id = $1`,
       [id]
     );
-    const clientInfo = byId.map((data) => {
+
+    const clientInfo = byId.rows.map((data) => {
       const info = {
         client: {
           id: data.clientId,
           name: data.clientName,
-          address: data.adress,
+          address: data.address,
           phone: data.phone,
         },
         cake: {
