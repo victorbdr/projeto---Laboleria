@@ -17,7 +17,7 @@ async function validCake(req, res, next) {
     const searchName = await db.query(`SELECT name FROM cakes WHERE name=$1`, [
       name,
     ]);
-    if (!searchName) {
+    if (searchName) {
       return res.sendStatus(409);
     }
   } catch (e) {
